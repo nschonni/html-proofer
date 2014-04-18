@@ -19,6 +19,18 @@ describe "Image tests" do
     output.should match /gpl.png does not have an alt attribute/
   end
 
+  it "ignores image marked for ignored alt attribute and no alt" do
+    missingAltFilepath = "#{FIXTURES_DIR}/missingImageAlt.html"
+    output = capture_stderr { HTML::Proofer.new(missingAltFilepath, { :alt_ignore => [ "/gpl.png" ]}).run }
+    output.should == ""
+  end
+
+  it "ignores image marked for ignored alt attribute and empty alt" do
+    missingAltFilepath = "#{FIXTURES_DIR}/missingImageAltText.html"
+    output = capture_stderr { HTML::Proofer.new(missingAltFilepath, { :alt_ignore => [ "/gpl.png" ]}).run }
+    output.should match == ""
+  end
+
   it "fails for missing external images" do
     externalImageFilepath = "#{FIXTURES_DIR}/missingImageExternal.html"
     output = capture_stderr { HTML::Proofer.new(externalImageFilepath).run }

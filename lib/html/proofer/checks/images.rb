@@ -5,7 +5,7 @@ class Image < ::HTML::Proofer::Checkable
   SCREEN_SHOT_REGEX = /Screen(?: |%20)Shot(?: |%20)\d+-\d+-\d+(?: |%20)at(?: |%20)\d+.\d+.\d+/
 
   def valid_alt_tag?
-    @alt and !@alt.empty?
+    @ignore_alt || @alt and !@alt.empty?
   end
 
   def terrible_filename?
@@ -18,6 +18,20 @@ class Image < ::HTML::Proofer::Checkable
 
   def missing_src?
     !src
+  end
+
+  def ignore_alt
+    unless @check.additional_alt_ignores.empty?
+      @check.additional_alt_ignores.each do |alt_ignore|
+        if alt_ignore.is_a? String
+          return true if alt_ignore == @src
+        elsif alt_ignore.is_a? Regexp
+          return true if alt_ignore =~ @src
+        else
+          return false
+        end
+      end
+    end
   end
 
 end
